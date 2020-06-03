@@ -1,0 +1,28 @@
+	/* To use subquery into active records.*/
+  
+  $this->db->select("a.*")
+					->from('tbl_a a')
+					->join('tbl_ab assmntschl','a.id=assmntschl.assessment_id','inner')
+					->where($where);
+		
+		$subquery=$this->db->get_compiled_select();
+    
+    
+    $this->db->select("count(DISTINCT(a.id)) as total_assess, b.board_name as board,s.subject_name as subject,c.class_name as class, 
+					 section.section_name as section,asec.section_id,
+					a.board_id,a.class_id, a.subject_id")
+					->join('tbl_ab assmntschl','a.id=assmntschl.assessment_id','inner')
+					->join('tbl_as asec','a.id=asec.assessment_id','left')
+					->join('tbl_se section','section.id = asec.section_id','left')
+					->join('tbl_bo b','a.board_id=b.id','inner')
+					->join('tbl_cs c','a.class_id=c.id','inner')
+					->join('tbl_st s','s.id = a.subject_id','inner')
+					->where($where.$where_section)
+					->group_by('asec.section_id,a.class_id,,a.subject_id')
+					->order_by('section.section_name','asc');
+		if($limit)
+		{
+			$this->db->limit($limit,$offset);
+		}
+		$this->db->from("( ".$subquery." )  as a",  FALSE);
+		$sql=$this->db->get();
