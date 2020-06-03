@@ -1,5 +1,7 @@
-	/* To use subquery into active records.*/
-  
+<?php
+
+/* To use subquery into active records.*/
+  function getData($limit, $offset,$where){
   $this->db->select("a.*")
 					->from('tbl_a a')
 					->join('tbl_ab assmntschl','a.id=assmntschl.assessment_id','inner')
@@ -17,7 +19,7 @@
 					->join('tbl_bo b','a.board_id=b.id','inner')
 					->join('tbl_cs c','a.class_id=c.id','inner')
 					->join('tbl_st s','s.id = a.subject_id','inner')
-					->where($where.$where_section)
+					->where($where)
 					->group_by('asec.section_id,a.class_id,,a.subject_id')
 					->order_by('section.section_name','asc');
 		if($limit)
@@ -25,4 +27,10 @@
 			$this->db->limit($limit,$offset);
 		}
 		$this->db->from("( ".$subquery." )  as a",  FALSE);
-		$sql=$this->db->get();
+        $sql=$this->db->get();
+        if($sql->num_rows() >0){
+            $result=$sql->result();
+        }
+	}	
+		
+		?>
